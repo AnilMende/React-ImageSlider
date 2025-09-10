@@ -35,15 +35,26 @@ export default function ImageSlider({ url, limit = 5, page = 1 }) {
         }
     }
 
-    useEffect(() => {
+    // for currentslide
 
+    // for left arrow i.e for previous
+    function handlePrevious() {
+        setCurrentSlide(currentSlide === 0 ? images.length - 1 : currentSlide - 1);
+    }
+
+    // for right arrow i.e. for next
+    function handleNext() {
+        setCurrentSlide(currentSlide === images.length - 1 ? 0 : currentSlide + 1);
+    }
+
+    useEffect(() => {
+        // if the url consists of any data then we can fetch it and passed into the fetchImages function
         if (url !== '') {
             fetchImages(url);
         }
     }, [url]);
 
-    console.log(images);
-
+    // console.log(images);
 
     // if the loading is true
     if (loading) {
@@ -55,31 +66,46 @@ export default function ImageSlider({ url, limit = 5, page = 1 }) {
         return <div>Error Occurred {error}</div>
     }
 
+
+
     return (
         <div className="container">
 
-            <BsArrowLeftCircleFill className="arrow arrow-left" />
+            <BsArrowLeftCircleFill onClick={handlePrevious} className="arrow arrow-left" />
             {
                 images && images.length ?
-                    images.map((imageItem) => (
+                    images.map((imageItem, index) => (
                         <img
                             key={imageItem.id}
                             src={imageItem.download_url}
                             alt={imageItem.download_url}
-                            className="current-image"
+
+                            className={currentSlide === index
+                                   ? "current-image" 
+                                   : "current-image hide-current-image"}
                         />
                     ))
                     : null
             }
-            
-            <BsArrowRightCircleFill className="arrow arrow-right"/>
+
+            <BsArrowRightCircleFill onClick={handleNext} className="arrow arrow-right" />
             <span className="circle-indicators">
                 {
                     images && images.length ?
-                    images.map((_, index) => (
-                        <button key={index} className="current-indicator"></button>
-                    ))
-                    : null
+                        images.map((_, index) => (
+                            // button is for dots represents the index of each image
+                            <button 
+                              key={index} 
+
+                              className={
+                                      currentSlide === index 
+                                      ? "current-indicator" 
+                                      : "current-indicator inactive-indicator"
+                                    }
+                                    onClick= {() => setCurrentSlide(index)}
+                                    ></button>
+                        ))
+                        : null
                 }
             </span>
 
